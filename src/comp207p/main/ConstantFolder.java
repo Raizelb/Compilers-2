@@ -44,6 +44,7 @@ public class ConstantFolder
 		ConstantPoolGen cpgen = cgen.getConstantPool();
 
 		// Implement your optimization here
+
         
 		this.optimized = gen.getJavaClass();
 	}
