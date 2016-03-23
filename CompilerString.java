@@ -1,5 +1,3 @@
-package comp207p.main;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
