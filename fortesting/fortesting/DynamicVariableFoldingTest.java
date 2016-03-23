@@ -1,5 +1,6 @@
-package comp207p.target;
+package fortesting;
 
+import fortesting.DynamicVariableFolding;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

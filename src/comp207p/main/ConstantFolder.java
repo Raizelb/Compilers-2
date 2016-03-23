@@ -9,14 +9,8 @@ import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.Code;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
-import org.apache.bcel.generic.ClassGen;
-import org.apache.bcel.generic.ConstantPoolGen;
-import org.apache.bcel.generic.InstructionHandle;
-import org.apache.bcel.generic.InstructionList;
+import org.apache.bcel.generic.*;
 import org.apache.bcel.util.InstructionFinder;
-import org.apache.bcel.generic.MethodGen;
-import org.apache.bcel.generic.TargetLostException;
-
 
 
 public class ConstantFolder
@@ -37,18 +31,84 @@ public class ConstantFolder
 			e.printStackTrace();
 		}
 	}
-	
-	public void optimize()
-	{
-		ClassGen cgen = new ClassGen(original);
-		ConstantPoolGen cpgen = cgen.getConstantPool();
 
-		// Implement your optimization here
+    // we rewrite integer constants with 5 :)
+    private void optimizeMethod(ClassGen cgen, ConstantPoolGen cpgen, Method method)
+    {
+        // Get the Code of the method, which is a collection of bytecode instructions
+        Code methodCode = method.getCode();
 
-        
-		this.optimized = gen.getJavaClass();
-	}
+        // Now get the actualy bytecode data in byte array,
+        // and use it to initialise an InstructionList
+        InstructionList instList = new InstructionList(methodCode.getCode());
 
+        // Initialise a method generator with the original method as the baseline
+        MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(), null, method.getName(), cgen.getClassName(), instList, cpgen);
+
+        // InstructionHandle is a wrapper for actual Instructions
+        for (InstructionHandle handle : instList.getInstructionHandles())
+        {
+            // if the instruction inside is iconst
+            if (handle.getInstruction() instanceof IADD)
+            {
+                // insert new one with integer 5, and...
+                InstructionHandle prev = handle.getPrev();
+                InstructionHandle prev2 = prev.getPrev();
+                if(prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
+
+                    String prevVal = prev.getInstruction().toString(cpgen.getConstantPool());
+                    int prevInt = Integer.parseInt(prevVal.substring(4));
+
+                    String prevVal2 = prev2.getInstruction().toString(cpgen.getConstantPool());
+                    int prevInt2 = Integer.parseInt(prevVal2.substring(4));
+
+                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevInt+prevInt2)));
+                    try {
+                        // delete the old one
+                        instList.delete(prev);
+                        instList.delete(prev2);
+                        instList.delete(handle);
+
+                    } catch (TargetLostException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        // setPositions(true) checks whether jump handles
+        // are all within the current method
+        instList.setPositions(true);
+
+        // set max stack/local
+        methodGen.setMaxStack();
+        methodGen.setMaxLocals();
+
+        // generate the new method with replaced iconst
+        Method newMethod = methodGen.getMethod();
+        // replace the method in the original class
+        cgen.replaceMethod(method, newMethod);
+
+    }
+    private void optimize()
+    {
+        // load the original class into a class generator
+        ClassGen cgen = new ClassGen(original);
+        ConstantPoolGen cpgen = cgen.getConstantPool();
+
+        // Do your optimization here
+        Method[] methods = cgen.getMethods();
+        for (Method m : methods)
+        {
+            optimizeMethod(cgen, cpgen, m);
+
+        }
+
+        // we generate a new class with modifications
+        // and store it in a member variable
+        this.optimized = cgen.getJavaClass();
+    }
 	
 	public void write(String optimisedFilePath)
 	{
