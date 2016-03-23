@@ -1,4 +1,4 @@
-package comp207p.main;
+package fortesting;
 
 import java.io.File;
 import java.io.FileNotFoundException;

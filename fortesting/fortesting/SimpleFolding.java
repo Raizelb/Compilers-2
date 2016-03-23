@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0_114.
  */
-package comp207p.target;
+package fortesting;
 
 import java.io.PrintStream;
 
