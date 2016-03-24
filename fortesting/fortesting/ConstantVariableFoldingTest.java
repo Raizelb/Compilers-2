@@ -1,6 +1,6 @@
 package fortesting;
 
-import fortesting.ConstantVariableFolding;
+import comp207p.target.ConstantVariableFolding;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
