@@ -6,10 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.apache.bcel.classfile.ClassParser;
-import org.apache.bcel.classfile.Code;
-import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.classfile.Method;
+import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
 import org.apache.bcel.util.InstructionFinder;
 
@@ -65,8 +62,9 @@ public class ConstantFolder {
         InstructionList instList = new InstructionList(methodCode.getCode());
 
         // Initialise a method generator with the original method as the baseline
-        MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
-                null, method.getName(), cgen.getClassName(), instList, cpgen);
+        // MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
+        //        null, method.getName(), cgen.getClassName(), instList, cpgen);
+        MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
 
         // InstructionHandle is a wrapper for actual Instructions
         for (InstructionHandle handle : instList.getInstructionHandles()) {
@@ -376,6 +374,8 @@ public class ConstantFolder {
             }
         }
 
+        methodGen.setInstructionList(instList);
+
         // setPositions(true) checks whether jump handles
         // are all within the current method
         instList.setPositions(true);
@@ -384,11 +384,13 @@ public class ConstantFolder {
         methodGen.setMaxStack();
         methodGen.setMaxLocals();
 
-        // generate the new method with replaced iconst
+        // remove local variable table
+        methodGen.removeLocalVariables();
+
+        // generate the new method with replaced instList
         Method newMethod = methodGen.getMethod();
         // replace the method in the original class
         cgen.replaceMethod(method, newMethod);
-
     }
 
     private void optimize() {

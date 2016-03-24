@@ -1,4 +1,4 @@
-package fortesting;
+package comp207p.target;
 
 import comp207p.target.ConstantVariableFolding;
 import org.junit.Test;
@@ -26,11 +26,11 @@ public class ConstantVariableFoldingTest {
     public void testMethodThree(){
         assertEquals(false, cvf.methodThree());
     }
-    
+
     @Test
     public void testMethodFour(){
         assertEquals(true, cvf.methodFour());
     }
-    
+
 
 }
