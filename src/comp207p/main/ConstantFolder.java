@@ -378,11 +378,11 @@ public class ConstantFolder {
 
         // setPositions(true) checks whether jump handles
         // are all within the current method
-        instList.setPositions(true);
+        // instList.setPositions(true);
 
         // set max stack/local
-        methodGen.setMaxStack();
-        methodGen.setMaxLocals();
+        // methodGen.setMaxStack();
+        // methodGen.setMaxLocals();
 
         // remove local variable table
         methodGen.removeLocalVariables();
