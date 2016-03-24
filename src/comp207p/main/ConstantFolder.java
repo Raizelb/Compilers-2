@@ -50,7 +50,7 @@ public class ConstantFolder {
         }
     }
 
-    private int getIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen){
+    private int getIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof LDC) {
             return (int) ((LDC) handle.getInstruction()).getValue(cpgen);
         } else if (handle.getInstruction() instanceof ICONST) {
@@ -60,28 +60,63 @@ public class ConstantFolder {
         } else if (handle.getInstruction() instanceof SIPUSH) {
             return (int) ((SIPUSH) handle.getInstruction()).getValue();
         } else if (handle.getInstruction() instanceof ILOAD) {
-            return loadValue(handle, instList, cpgen);
+            return loadIntValue(handle, instList, cpgen);
         }
         System.out.println("Error getIntValue()");
         return 0;
     }
 
-    private int loadValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+    private float getFloatValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof LDC) {
+            return (float) ((LDC) handle.getInstruction()).getValue(cpgen);
+        } else if (handle.getInstruction() instanceof FCONST) {
+            return (float) ((FCONST) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof FLOAD) {
+            return loadFloatValue(handle, instList, cpgen);
+        }
+        System.out.println("Error getFloatValue()");
+        return 0;
+    }
+
+    private long getLongValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof LDC2_W) {
+            return (long) ((LDC2_W) handle.getInstruction()).getValue(cpgen);
+        } else if (handle.getInstruction() instanceof LCONST) {
+            return (long) ((LCONST) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof LLOAD) {
+            return loadLongValue(handle, instList, cpgen);
+        }
+        System.out.println("Error getLongValue()");
+        return 0;
+    }
+
+    private double getDoubleValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof LDC2_W) {
+            return (double) ((LDC2_W) handle.getInstruction()).getValue(cpgen);
+        } else if (handle.getInstruction() instanceof DCONST) {
+            return (double) ((DCONST) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof DLOAD) {
+            return loadDoubleValue(handle, instList, cpgen);
+        }
+        System.out.println("Error getDoubleValue()");
+        return 0;
+    }
+
+    private int loadIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof ILOAD) {
             int test1 = ((ILOAD) handle.getInstruction()).getIndex();
             for (InstructionHandle handle1 : instList.getInstructionHandles()) {
                 if (handle1.getInstruction() instanceof ISTORE) {
                     int test2 = ((ISTORE) handle1.getInstruction()).getIndex();
-                    //short test3 = ((ISTORE) handle1.getInstruction()).getCanonicalTag();
                     int test3 = 0;
                     if (handle1.getPrev().getInstruction() instanceof LDC) {
                         test3 = (int) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
-                    }
-                    else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
+                    } else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
                         test3 = (int) ((SIPUSH) handle1.getPrev().getInstruction()).getValue();
-                    }
-                    else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
+                    } else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
                         test3 = (int) ((BIPUSH) handle1.getPrev().getInstruction()).getValue();
+                    } else if (handle1.getPrev().getInstruction() instanceof ICONST) {
+                        test3 = (int) ((ICONST) handle1.getPrev().getInstruction()).getValue();
                     }
                     if (test1 == test2) {
                         return test3;
@@ -89,7 +124,73 @@ public class ConstantFolder {
                 }
             }
         }
-        System.out.println("Error loadValue()");
+        System.out.println("Error loadIntValue()");
+        return 0;
+    }
+
+    private float loadFloatValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof FLOAD) {
+            int test1 = ((FLOAD) handle.getInstruction()).getIndex();
+            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+                if (handle1.getInstruction() instanceof FSTORE) {
+                    int test2 = ((FSTORE) handle1.getInstruction()).getIndex();
+                    float test3 = 0;
+                    if (handle1.getPrev().getInstruction() instanceof LDC) {
+                        test3 = (float) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
+                    } else if (handle1.getPrev().getInstruction() instanceof FCONST) {
+                        test3 = (float) ((FCONST) handle1.getPrev().getInstruction()).getValue();
+                    }
+                    if (test1 == test2) {
+                        return test3;
+                    }
+                }
+            }
+        }
+        System.out.println("Error loadFloatValue()");
+        return 0;
+    }
+
+    private long loadLongValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof LLOAD) {
+            int test1 = ((LLOAD) handle.getInstruction()).getIndex();
+            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+                if (handle1.getInstruction() instanceof LSTORE) {
+                    int test2 = ((LSTORE) handle1.getInstruction()).getIndex();
+                    long test3 = 0;
+                    if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
+                        test3 = (long) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
+                    } else if (handle1.getPrev().getInstruction() instanceof LCONST) {
+                        test3 = (long) ((LCONST) handle1.getPrev().getInstruction()).getValue();
+                    }
+                    if (test1 == test2) {
+                        return test3;
+                    }
+                }
+            }
+        }
+        System.out.println("Error loadLongValue()");
+        return 0;
+    }
+
+    private double loadDoubleValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof DLOAD) {
+            int test1 = ((DLOAD) handle.getInstruction()).getIndex();
+            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+                if (handle1.getInstruction() instanceof DSTORE) {
+                    int test2 = ((DSTORE) handle1.getInstruction()).getIndex();
+                    double test3 = 0;
+                    if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
+                        test3 = (double) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
+                    } else if (handle1.getPrev().getInstruction() instanceof DCONST) {
+                        test3 = (int) ((DCONST) handle1.getPrev().getInstruction()).getValue();
+                    }
+                    if (test1 == test2) {
+                        return test3;
+                    }
+                }
+            }
+        }
+        System.out.println("Error loadDoubleValue()");
         return 0;
     }
 
@@ -167,7 +268,6 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof INEG) {
                 InstructionHandle prev = handle.getPrev();
-
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(-prevVal)));
@@ -177,229 +277,190 @@ public class ConstantFolder {
             if (handle.getInstruction() instanceof FADD) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    float prevVal2 = (float) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                float prevVal = getFloatValue(prev, instList, cpgen);
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 + prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 + prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof FSUB) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    float prevVal2 = (float) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                float prevVal = getFloatValue(prev, instList, cpgen);
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 - prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 - prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof FMUL) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    float prevVal2 = (float) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                float prevVal = getFloatValue(prev, instList, cpgen);
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 * prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 * prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof FDIV) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    float prevVal2 = (float) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                float prevVal = getFloatValue(prev, instList, cpgen);
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 / prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 / prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof FREM) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    float prevVal2 = (float) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                float prevVal = getFloatValue(prev, instList, cpgen);
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 % prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 % prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof FNEG) {
                 InstructionHandle prev = handle.getPrev();
-                if (prev.getInstruction() instanceof LDC) {
+                float prevVal = getFloatValue(prev, instList, cpgen);
 
-                    float prevVal = (float) ((LDC) prev.getInstruction()).getValue(cpgen);
-
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(-prevVal)));
-                    removeInstructions(instList, handle, prev);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(-prevVal)));
+                removeInstructions(instList, handle, prev);
             }
 
             if (handle.getInstruction() instanceof LADD) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    long prevVal2 = (long) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                long prevVal = getLongValue(prev, instList, cpgen);
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 + prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(prevVal2 + prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof LSUB) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    long prevVal2 = (long) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                long prevVal = getLongValue(prev, instList, cpgen);
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 - prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(prevVal2 - prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof LMUL) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    long prevVal2 = (long) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                long prevVal = getLongValue(prev, instList, cpgen);
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 * prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(prevVal2 * prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof LDIV) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    long prevVal2 = (long) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                long prevVal = getLongValue(prev, instList, cpgen);
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 / prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(prevVal2 / prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof LREM) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    long prevVal2 = (long) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                long prevVal = getLongValue(prev, instList, cpgen);
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 % prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(prevVal2 % prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof LNEG) {
                 InstructionHandle prev = handle.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W) {
+                long prevVal = getLongValue(prev, instList, cpgen);
 
-                    long prevVal = (long) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(-prevVal)));
-                    removeInstructions(instList, handle, prev);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addLong(-prevVal)));
+                removeInstructions(instList, handle, prev);
             }
 
             if (handle.getInstruction() instanceof DADD) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    double prevVal2 = (double) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 + prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(prevVal2 + prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof DSUB) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    double prevVal2 = (double) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 - prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(prevVal2 - prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof DMUL) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    double prevVal2 = (double) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 * prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(prevVal2 * prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof DDIV) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    double prevVal2 = (double) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 / prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(prevVal2 / prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof DREM) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W && prev2.getInstruction() instanceof LDC2_W) {
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-                    double prevVal2 = (double) ((LDC2_W) prev2.getInstruction()).getValue(cpgen);
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 % prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(prevVal2 % prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof DNEG) {
                 InstructionHandle prev = handle.getPrev();
-                if (prev.getInstruction() instanceof LDC2_W) {
+                double prevVal = getDoubleValue(prev, instList, cpgen);
 
-                    double prevVal = (double) ((LDC2_W) prev.getInstruction()).getValue(cpgen);
-
-                    instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(-prevVal)));
-                    removeInstructions(instList, handle, prev);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addDouble(-prevVal)));
+                removeInstructions(instList, handle, prev);
             }
         }
 
