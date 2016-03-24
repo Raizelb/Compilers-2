@@ -4,11 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
-import org.apache.bcel.util.InstructionFinder;
 
 
 public class ConstantFolder {
@@ -52,6 +50,49 @@ public class ConstantFolder {
         }
     }
 
+    private int getIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen){
+        if (handle.getInstruction() instanceof LDC) {
+            return (int) ((LDC) handle.getInstruction()).getValue(cpgen);
+        } else if (handle.getInstruction() instanceof ICONST) {
+            return (int) ((ICONST) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof BIPUSH) {
+            return (int) ((BIPUSH) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof SIPUSH) {
+            return (int) ((SIPUSH) handle.getInstruction()).getValue();
+        } else if (handle.getInstruction() instanceof ILOAD) {
+            return loadValue(handle, instList, cpgen);
+        }
+        System.out.println("Error getIntValue()");
+        return 0;
+    }
+
+    private int loadValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
+        if (handle.getInstruction() instanceof ILOAD) {
+            int test1 = ((ILOAD) handle.getInstruction()).getIndex();
+            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+                if (handle1.getInstruction() instanceof ISTORE) {
+                    int test2 = ((ISTORE) handle1.getInstruction()).getIndex();
+                    //short test3 = ((ISTORE) handle1.getInstruction()).getCanonicalTag();
+                    int test3 = 0;
+                    if (handle1.getPrev().getInstruction() instanceof LDC) {
+                        test3 = (int) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
+                    }
+                    else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
+                        test3 = (int) ((SIPUSH) handle1.getPrev().getInstruction()).getValue();
+                    }
+                    else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
+                        test3 = (int) ((BIPUSH) handle1.getPrev().getInstruction()).getValue();
+                    }
+                    if (test1 == test2) {
+                        return test3;
+                    }
+                }
+            }
+        }
+        System.out.println("Error loadValue()");
+        return 0;
+    }
+
     // we rewrite integer constants with 5 :)
     private void optimizeMethod(ClassGen cgen, ConstantPoolGen cpgen, Method method) {
         // Get the Code of the method, which is a collection of bytecode instructions
@@ -72,77 +113,65 @@ public class ConstantFolder {
             if (handle.getInstruction() instanceof IADD) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    int prevVal2 = (int) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 + prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 + prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof ISUB) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    int prevVal2 = (int) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 - prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 - prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof IMUL) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    int prevVal2 = (int) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 * prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 * prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof IDIV) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    int prevVal2 = (int) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 / prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 / prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof IREM) {
                 InstructionHandle prev = handle.getPrev();
                 InstructionHandle prev2 = prev.getPrev();
-                if (prev.getInstruction() instanceof LDC && prev2.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
-                    int prevVal2 = (int) ((LDC) prev2.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 % prevVal)));
-                    removeInstructions(instList, handle, prev, prev2);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 % prevVal)));
+                removeInstructions(instList, handle, prev, prev2);
             }
 
             if (handle.getInstruction() instanceof INEG) {
                 InstructionHandle prev = handle.getPrev();
-                if (prev.getInstruction() instanceof LDC) {
 
-                    int prevVal = (int) ((LDC) prev.getInstruction()).getValue(cpgen);
+                int prevVal = getIntValue(prev, instList, cpgen);
 
-                    instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(-prevVal)));
-                    removeInstructions(instList, handle, prev);
-                }
+                instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(-prevVal)));
+                removeInstructions(instList, handle, prev);
             }
 
             if (handle.getInstruction() instanceof FADD) {
@@ -370,28 +399,6 @@ public class ConstantFolder {
 
                     instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(-prevVal)));
                     removeInstructions(instList, handle, prev);
-                }
-            }
-            if (handle.getInstruction() instanceof ILOAD) {
-                int test1 = ((ILOAD) handle.getInstruction()).getIndex();
-                for (InstructionHandle handle1 : instList.getInstructionHandles()) {
-                    if (handle1.getInstruction() instanceof ISTORE) {
-                        int test2 = ((ISTORE) handle1.getInstruction()).getIndex();
-                        //short test3 = ((ISTORE) handle1.getInstruction()).getCanonicalTag();
-                        int test3 = 0;
-                        if (handle1.getPrev().getInstruction() instanceof LDC) {
-                            test3 = (int) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
-                        }
-                        else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
-                            test3 = (int) ((SIPUSH) handle1.getPrev().getInstruction()).getValue();
-                        }
-                        else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
-                            test3 = (int) ((BIPUSH) handle1.getPrev().getInstruction()).getValue();
-                        }
-                        if (test1 == test2) {
-                            System.out.println(test1 + " " + test2 + " " + test3);
-                        }
-                    }
                 }
             }
         }
