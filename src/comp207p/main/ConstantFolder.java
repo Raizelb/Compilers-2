@@ -372,6 +372,28 @@ public class ConstantFolder {
                     removeInstructions(instList, handle, prev);
                 }
             }
+            if (handle.getInstruction() instanceof ILOAD) {
+                int test1 = ((ILOAD) handle.getInstruction()).getIndex();
+                for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+                    if (handle1.getInstruction() instanceof ISTORE) {
+                        int test2 = ((ISTORE) handle1.getInstruction()).getIndex();
+                        //short test3 = ((ISTORE) handle1.getInstruction()).getCanonicalTag();
+                        int test3 = 0;
+                        if (handle1.getPrev().getInstruction() instanceof LDC) {
+                            test3 = (int) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
+                        }
+                        else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
+                            test3 = (int) ((SIPUSH) handle1.getPrev().getInstruction()).getValue();
+                        }
+                        else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
+                            test3 = (int) ((BIPUSH) handle1.getPrev().getInstruction()).getValue();
+                        }
+                        if (test1 == test2) {
+                            System.out.println(test1 + " " + test2 + " " + test3);
+                        }
+                    }
+                }
+            }
         }
 
         methodGen.setInstructionList(instList);
