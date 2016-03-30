@@ -7,7 +7,6 @@ public class ConstantVariableFolding
         int b = (a + 764) * 3;
         return b + 1234 - a;
     }
-    /*
 
     public double methodTwo(){
         double i = 0.67;
@@ -23,13 +22,12 @@ public class ConstantVariableFolding
         return x > y;
     }
 
-    /*
-
     public boolean methodFour(){
         long x = 4835783423L;
         long y = 400000;
         long z = x + y;
         return x > y;
     }
+
     */
 }
