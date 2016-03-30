@@ -14,3 +14,6 @@ hs_err_pid*
 # additional (test reports)
 *.j
 *.txt
+
+# intelliJ
+*.xml
