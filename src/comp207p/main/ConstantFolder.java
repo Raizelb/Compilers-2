@@ -262,9 +262,9 @@ public class ConstantFolder {
         InstructionList instList = new InstructionList(methodCode.getCode());
 
         // Initialise a method generator with the original method as the baseline
-        // MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
-        //        null, method.getName(), cgen.getClassName(), instList, cpgen);
-        MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
+        MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
+                null, method.getName(), cgen.getClassName(), instList, cpgen);
+        //MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
 
         // InstructionHandle is a wrapper for actual Instructions
         for (InstructionHandle handle : instList.getInstructionHandles()) {
@@ -571,10 +571,19 @@ public class ConstantFolder {
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 if(prevVal2 <= prevVal) {
-                    instList.insert(handle, new GOTO(((IF_ICMPLE) handle.getInstruction()).getTarget()));
+                    //instList.insert(handle, new GOTO(((IF_ICMPLE) handle.getInstruction()).getTarget()));
+                    instList.insert(handle, new ICONST (0));
+                }
+                else {
+                    instList.insert(handle, new ICONST (1));
                 }
 
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
                 removeInstructions(instList, handle, prev, prev2);
+                removeInstructions(instList, next, next1, next2);
             }
 
             if (handle.getInstruction() instanceof IF_ICMPLT) {
@@ -610,14 +619,15 @@ public class ConstantFolder {
 
         // setPositions(true) checks whether jump handles
         // are all within the current method
-        // instList.setPositions(true);
+        instList.setPositions(true);
 
         // set max stack/local
-        // methodGen.setMaxStack();
-        // methodGen.setMaxLocals();
+        methodGen.setMaxStack();
+        methodGen.setMaxLocals();
 
         // remove local variable table
         methodGen.removeLocalVariables();
+
 
         // generate the new method with replaced instList
         Method newMethod = methodGen.getMethod();
