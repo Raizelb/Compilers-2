@@ -181,7 +181,6 @@ public class ConstantFolder {
                     }
                 }
                 handle1 = handle1.getPrev();
-                System.out.println(handle1.getInstruction().getName());
             }
         }
 
@@ -205,6 +204,7 @@ public class ConstantFolder {
                         return value;
                     }
                 }
+                handle1 = handle1.getPrev();
             }
         }
         System.out.println("Error loadFloatValue()");
@@ -227,6 +227,7 @@ public class ConstantFolder {
                         return value;
                     }
                 }
+                handle1 = handle1.getPrev();
             }
         }
         System.out.println("Error loadLongValue()");
@@ -249,6 +250,7 @@ public class ConstantFolder {
                         return value;
                     }
                 }
+                handle1 = handle1.getPrev();
             }
         }
         System.out.println("Error loadDoubleValue()");
