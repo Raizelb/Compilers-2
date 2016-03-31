@@ -163,7 +163,7 @@ public class ConstantFolder {
     private int loadIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof ILOAD) {
             int index = ((ILOAD) handle.getInstruction()).getIndex();
-            InstructionHandle handle1 = handle.getPrev();
+            InstructionHandle handle1 = handle;
             while (handle1.getPrev() != null) {
                 if(handle1.getInstruction() instanceof ISTORE) {
                     int value = 0;
@@ -181,27 +181,28 @@ public class ConstantFolder {
                     }
                 }
                 handle1 = handle1.getPrev();
+                System.out.println(handle1.getInstruction().getName());
             }
         }
-        
+
         System.out.println("Error loadIntValue()");
         return 0;
     }
 
     private float loadFloatValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof FLOAD) {
-            int test1 = ((FLOAD) handle.getInstruction()).getIndex();
-            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+            int index = ((FLOAD) handle.getInstruction()).getIndex();
+            InstructionHandle handle1 = handle.getPrev();
+            while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof FSTORE) {
-                    int test2 = ((FSTORE) handle1.getInstruction()).getIndex();
-                    float test3 = 0;
+                    float value = 0;
                     if (handle1.getPrev().getInstruction() instanceof LDC) {
-                        test3 = (float) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
+                        value = (float) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
                     } else if (handle1.getPrev().getInstruction() instanceof FCONST) {
-                        test3 = (float) ((FCONST) handle1.getPrev().getInstruction()).getValue();
+                        value = (float) ((FCONST) handle1.getPrev().getInstruction()).getValue();
                     }
-                    if (test1 == test2) {
-                        return test3;
+                    if (index == ((FSTORE) handle1.getInstruction()).getIndex()) {
+                        return value;
                     }
                 }
             }
@@ -212,18 +213,18 @@ public class ConstantFolder {
 
     private long loadLongValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof LLOAD) {
-            int test1 = ((LLOAD) handle.getInstruction()).getIndex();
-            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+            int index = ((LLOAD) handle.getInstruction()).getIndex();
+            InstructionHandle handle1 = handle.getPrev();
+            while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof LSTORE) {
-                    int test2 = ((LSTORE) handle1.getInstruction()).getIndex();
-                    long test3 = 0;
+                    long value = 0;
                     if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
-                        test3 = (long) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
+                        value = (long) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
                     } else if (handle1.getPrev().getInstruction() instanceof LCONST) {
-                        test3 = (long) ((LCONST) handle1.getPrev().getInstruction()).getValue();
+                        value = (long) ((LCONST) handle1.getPrev().getInstruction()).getValue();
                     }
-                    if (test1 == test2) {
-                        return test3;
+                    if (index == ((LSTORE) handle1.getInstruction()).getIndex()) {
+                        return value;
                     }
                 }
             }
@@ -234,18 +235,18 @@ public class ConstantFolder {
 
     private double loadDoubleValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof DLOAD) {
-            int test1 = ((DLOAD) handle.getInstruction()).getIndex();
-            for (InstructionHandle handle1 : instList.getInstructionHandles()) {
+            int index = ((DLOAD) handle.getInstruction()).getIndex();
+            InstructionHandle handle1 = handle.getPrev();
+            while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof DSTORE) {
-                    int test2 = ((DSTORE) handle1.getInstruction()).getIndex();
-                    double test3 = 0;
+                    double value = 0;
                     if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
-                        test3 = (double) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
+                        value = (double) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
                     } else if (handle1.getPrev().getInstruction() instanceof DCONST) {
-                        test3 = (int) ((DCONST) handle1.getPrev().getInstruction()).getValue();
+                        value = (int) ((DCONST) handle1.getPrev().getInstruction()).getValue();
                     }
-                    if (test1 == test2) {
-                        return test3;
+                    if (index == ((DSTORE) handle1.getInstruction()).getIndex()) {
+                        return value;
                     }
                 }
             }
