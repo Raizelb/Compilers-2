@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="72eec9f2-ba2b-4f7f-ba0c-109dd7f7da31" name="Default" comment="stuff">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java" afterPath="$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/comp207p/target/ConstantVariableFolding.java" afterPath="$PROJECT_DIR$/src/comp207p/target/ConstantVariableFolding.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/comp207p/target/ConstantVariableFoldingTest.java" afterPath="$PROJECT_DIR$/test/comp207p/target/ConstantVariableFoldingTest.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFolding.java" afterPath="$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFoldingTest.java" afterPath="$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java" />
     </list>
     <ignored path="Compilers-2.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -28,44 +27,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="ConstantFolder.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ConstantFolder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
+            <state relative-caret-position="-312">
               <caret line="720" column="0" selection-start-line="720" selection-start-column="0" selection-end-line="720" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ConstantVariableFolding.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/comp207p/target/ConstantVariableFolding.java">
+      <file leaf-file-name="DynamicVariableFolding.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="616">
-              <caret line="28" column="1" selection-start-line="28" selection-start-column="1" selection-end-line="28" selection-end-column="1" />
+            <state relative-caret-position="330">
+              <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DynamicVariableFolding.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFolding.java">
+      <file leaf-file-name="DynamicVariableFoldingTest.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="660">
-              <caret line="30" column="30" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ConstantVariableFoldingTest.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/comp207p/target/ConstantVariableFoldingTest.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="506">
-              <caret line="32" column="5" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
+            <state relative-caret-position="-4">
+              <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
               <folding>
-                <element signature="e#635#636#0" expanded="true" />
-                <element signature="e#687#688#0" expanded="true" />
+                <marker date="1459439621646" expanded="false" signature="997:1012" placeholder=" { " />
+                <marker date="1459439621646" expanded="false" signature="1048:1054" placeholder=" }" />
+                <marker date="1459439621646" expanded="false" signature="1099:1114" placeholder=" { " />
+                <marker date="1459439621646" expanded="false" signature="1150:1156" placeholder=" }" />
+                <marker date="1459439621646" expanded="false" signature="1204:1214" placeholder=" { " />
+                <marker date="1459439621646" expanded="false" signature="1249:1255" placeholder=" }" />
               </folding>
             </state>
           </provider>
@@ -104,7 +97,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java" />
         <option value="$PROJECT_DIR$/src/comp207p/main/Five.java" />
         <option value="$PROJECT_DIR$/src/comp207p/main/CompilerString.java" />
         <option value="$PROJECT_DIR$/SimpleFolding.java" />
@@ -117,7 +109,6 @@
         <option value="$PROJECT_DIR$/build/classes/comp207p/target/SimpleFolding.class" />
         <option value="$PROJECT_DIR$/fortesting/fortesting/Five.java" />
         <option value="$PROJECT_DIR$/test/fortesting/DynamicVariableFoldingTest.java" />
-        <option value="$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java" />
         <option value="$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFolding.java" />
         <option value="$PROJECT_DIR$/fortesting/fortesting/ConstantVariableFoldingTest.java" />
         <option value="$PROJECT_DIR$/fortesting/fortesting/ConstantVariableFolding.java" />
@@ -128,6 +119,8 @@
         <option value="$PROJECT_DIR$/test/comp207p/target/ConstantVariableFoldingTest.java" />
         <option value="$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java" />
         <option value="$PROJECT_DIR$/src/comp207p/target/ConstantVariableFolding.java" />
+        <option value="$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java" />
+        <option value="$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java" />
       </list>
     </option>
   </component>
@@ -183,6 +176,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Compilers-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Compilers-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Compilers-2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="target" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -283,21 +294,21 @@
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/fortesting" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.appearance" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\GitHub\Compilers-2\src\comp207p\target" />
+      <recent name="D:\GitHub\Compilers-2\fortesting\fortesting" />
+      <recent name="D:\GitHub\Compilers-2" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="comp207p.target" />
       <recent name="fortesting" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\GitHub\Compilers-2\src\fortesting" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\GitHub\Compilers-2\src\comp207p\target" />
-      <recent name="D:\GitHub\Compilers-2\fortesting\fortesting" />
-      <recent name="D:\GitHub\Compilers-2" />
     </key>
   </component>
   <component name="RunManager" selected="JUnit.ConstantVariableFoldingTest">
@@ -363,8 +374,8 @@
       <module name="Compilers-2" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="fortesting" />
-      <option name="MAIN_CLASS_NAME" value="fortesting.DynamicVariableFoldingTest" />
+      <option name="PACKAGE_NAME" value="comp207p.target" />
+      <option name="MAIN_CLASS_NAME" value="comp207p.target.DynamicVariableFoldingTest" />
       <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" value="-ea" />
@@ -864,7 +875,7 @@
       <workItem from="1458820066032" duration="14791000" />
       <workItem from="1458836993460" duration="2602000" />
       <workItem from="1459363395680" duration="3681000" />
-      <workItem from="1459435942746" duration="2312000" />
+      <workItem from="1459435942746" duration="3867000" />
     </task>
     <task id="LOCAL-00001" summary="to work on windows">
       <created>1458581477609</created>
@@ -916,7 +927,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="42413000" />
+    <option name="totallyTimeSpent" value="43968000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -1134,7 +1145,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFoldingTest.java">
+    <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
           <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
@@ -1168,7 +1179,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFoldingTest.java">
+    <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="264">
           <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
@@ -1218,14 +1229,6 @@
     <entry file="file://$PROJECT_DIR$/build/classes/comp207p/target/DynamicVariableFolding.class" />
     <entry file="file://$PROJECT_DIR$/build/classes/comp207p/main/Main.class" />
     <entry file="file://$PROJECT_DIR$/build/classes/comp207p/target/SimpleFolding.class" />
-    <entry file="file://$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFoldingTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fortesting/fortesting/Five.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="352">
@@ -1290,14 +1293,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fortesting/fortesting/DynamicVariableFolding.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="30" column="30" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/comp207p/target/ConstantVariableFolding.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="616">
@@ -1306,10 +1301,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4">
+          <caret line="14" column="3" selection-start-line="14" selection-start-column="3" selection-end-line="14" selection-end-column="3" />
+          <folding>
+            <marker date="1459439621646" expanded="false" signature="997:1012" placeholder=" { " />
+            <marker date="1459439621646" expanded="false" signature="1048:1054" placeholder=" }" />
+            <marker date="1459439621646" expanded="false" signature="1099:1114" placeholder=" { " />
+            <marker date="1459439621646" expanded="false" signature="1150:1156" placeholder=" }" />
+            <marker date="1459439621646" expanded="false" signature="1204:1214" placeholder=" { " />
+            <marker date="1459439621646" expanded="false" signature="1249:1255" placeholder=" }" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
+        <state relative-caret-position="-312">
           <caret line="720" column="0" selection-start-line="720" selection-start-column="0" selection-end-line="720" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="15" column="34" selection-start-line="15" selection-start-column="34" selection-end-line="15" selection-end-column="34" />
           <folding />
         </state>
       </provider>

@@ -1,4 +1,4 @@
-package fortesting;
+package comp207p.target;
 
 public class DynamicVariableFolding {
     public int methodOne() {
@@ -7,6 +7,8 @@ public class DynamicVariableFolding {
         a = b - 67;
         return b + 1234 - a;
     }
+
+    /*
 
     public boolean methodTwo() {
         int x = 12345;
@@ -35,4 +37,6 @@ public class DynamicVariableFolding {
         b = a + 2;
         return a * b;
     }
+
+    */
 }
