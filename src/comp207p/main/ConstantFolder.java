@@ -652,6 +652,196 @@ public class ConstantFolder {
                 removeInstructions(instList, handle, prev, prev2);
                 removeInstructions(instList, next, next1, next2);
             }
+
+            if(handle.getInstruction() instanceof LCMP) {
+                InstructionHandle prev = handle.getPrev();
+                long prevVal = getLongValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                long prevVal2 = getLongValue(prev2, instList, cpgen);
+
+                if(prevVal2 > prevVal) {
+                    instList.insert(handle, new ICONST (1));
+                } else if(prevVal2 == prevVal) {
+                    instList.insert(handle, new ICONST (0));
+                } else if(prevVal2 < prevVal) {
+                    instList.insert(handle, new ICONST (-1));
+                }
+
+                removeInstructions(instList, handle, prev, prev2);
+            }
+
+            if(handle.getInstruction() instanceof FCMPG) {
+                InstructionHandle prev = handle.getPrev();
+                float prevVal = getFloatValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
+
+                if(prevVal2 > prevVal) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                removeInstructions(instList, handle, prev, prev2);
+            }
+
+            if(handle.getInstruction() instanceof FCMPL) {
+                InstructionHandle prev = handle.getPrev();
+                float prevVal = getFloatValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                float prevVal2 = getFloatValue(prev2, instList, cpgen);
+
+                if(prevVal2 < prevVal) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                removeInstructions(instList, handle, prev, prev2);
+            }
+
+            if(handle.getInstruction() instanceof DCMPG) {
+                InstructionHandle prev = handle.getPrev();
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
+
+                if(prevVal2 > prevVal) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                removeInstructions(instList, handle, prev, prev2);
+            }
+
+            if(handle.getInstruction() instanceof DCMPL) {
+                InstructionHandle prev = handle.getPrev();
+                double prevVal = getDoubleValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                double prevVal2 = getDoubleValue(prev2, instList, cpgen);
+
+                if(prevVal2 < prevVal) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                removeInstructions(instList, handle, prev, prev2);
+            }
+
+            if(handle.getInstruction() instanceof IFEQ) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal == 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
+
+            if(handle.getInstruction() instanceof IFGE) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal >= 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
+
+            if(handle.getInstruction() instanceof IFGT) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal > 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
+
+            if(handle.getInstruction() instanceof IFLE) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal <= 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
+
+            if(handle.getInstruction() instanceof IFLT) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal < 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
+
+            if(handle.getInstruction() instanceof IFNE) {
+                InstructionHandle prev = handle.getPrev();
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                if(prevVal != 0) {
+                    instList.insert(handle, new ICONST (0));
+                } else {
+                    instList.insert(handle, new ICONST (1));
+                }
+
+                InstructionHandle next = handle.getNext();
+                InstructionHandle next1 = next.getNext();
+                InstructionHandle next2 = next1.getNext();
+
+                removeInstructions(instList, handle, prev);
+                removeInstructions(instList, next, next1, next2);
+            }
         }
 
         methodGen.setInstructionList(instList);

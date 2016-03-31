@@ -27,12 +27,8 @@ public class ConstantVariableFoldingTest {
         assertEquals(false, cvf.methodThree());
     }
 
-    /*
-
     @Test
     public void testMethodFour(){
         assertEquals(true, cvf.methodFour());
     }
-
-    */
 }
