@@ -190,14 +190,8 @@ public class ConstantFolder {
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof FSTORE) {
-                    float value = 0;
-                    if (handle1.getPrev().getInstruction() instanceof LDC) {
-                        value = (float) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
-                    } else if (handle1.getPrev().getInstruction() instanceof FCONST) {
-                        value = (float) ((FCONST) handle1.getPrev().getInstruction()).getValue();
-                    }
                     if (index == ((FSTORE) handle1.getInstruction()).getIndex()) {
-                        return value;
+                        return getFloatValue(handle1.getPrev(), instList, cpgen);
                     }
                 }
                 handle1 = handle1.getPrev();
@@ -213,14 +207,8 @@ public class ConstantFolder {
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof LSTORE) {
-                    long value = 0;
-                    if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
-                        value = (long) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
-                    } else if (handle1.getPrev().getInstruction() instanceof LCONST) {
-                        value = (long) ((LCONST) handle1.getPrev().getInstruction()).getValue();
-                    }
                     if (index == ((LSTORE) handle1.getInstruction()).getIndex()) {
-                        return value;
+                        return getLongValue(handle1.getPrev(), instList, cpgen);
                     }
                 }
                 handle1 = handle1.getPrev();
@@ -236,14 +224,8 @@ public class ConstantFolder {
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
                 if (handle1.getInstruction() instanceof DSTORE) {
-                    double value = 0;
-                    if (handle1.getPrev().getInstruction() instanceof LDC2_W) {
-                        value = (double) ((LDC2_W) handle1.getPrev().getInstruction()).getValue(cpgen);
-                    } else if (handle1.getPrev().getInstruction() instanceof DCONST) {
-                        value = (int) ((DCONST) handle1.getPrev().getInstruction()).getValue();
-                    }
                     if (index == ((DSTORE) handle1.getInstruction()).getIndex()) {
-                        return value;
+                        return getDoubleValue(handle1.getPrev(), instList, cpgen);
                     }
                 }
                 handle1 = handle1.getPrev();
