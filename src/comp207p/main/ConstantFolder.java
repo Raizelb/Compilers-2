@@ -165,33 +165,45 @@ public class ConstantFolder {
     }
 
     private boolean checkLoopModification(InstructionHandle handle) {
-        //check if trying to load a value inside a loop that will be modified after (shouldn't be folded)
-        //TODO check if modification happen inside loop before handle
+        //check if trying to load a value that is going to be modified in current for/while loop (shouldn't be folded)
         if (handle.getInstruction() instanceof ILOAD) {
             int index = ((ILOAD) handle.getInstruction()).getIndex();
             int position = handle.getPosition();
+            InstructionHandle target = null;
 
             InstructionHandle handle1 = handle;
             boolean modifiedBeforeGoto = false;
             while (handle1.getNext() != null) {
                 if (handle1.getInstruction() instanceof GOTO) {
-                    int targetPos = ((GOTO) handle1.getInstruction()).getTarget().getPosition();
-                    //TODO check instructions between targetPos and position?
+                    InstructionHandle targetLocal = ((GOTO) handle1.getInstruction()).getTarget();
+                    int targetPos = targetLocal.getPosition();
                     if (modifiedBeforeGoto && targetPos <= position) {
                         return true;
                     }
-                }
-                if (handle1.getInstruction() instanceof ISTORE) {
-                    if(((ISTORE) handle1.getInstruction()).getIndex() == index) {
-                        modifiedBeforeGoto = true;
+                    if (targetPos < position && (target == null || target.getPosition() > targetPos)) {
+                        target = targetLocal;
                     }
                 }
-                if (handle1.getInstruction() instanceof IINC) {
-                    if(((IINC) handle1.getInstruction()).getIndex() == index) {
-                        modifiedBeforeGoto = true;
-                    }
+                if (handle1.getInstruction() instanceof ISTORE && ((ISTORE) handle1.getInstruction()).getIndex() == index) {
+                    modifiedBeforeGoto = true;
+                }
+                if (handle1.getInstruction() instanceof IINC && ((IINC) handle1.getInstruction()).getIndex() == index) {
+                    modifiedBeforeGoto = true;
                 }
                 handle1 = handle1.getNext();
+            }
+
+            // checks within the loop before the load instruction's position
+            if(target == null) { return false; }
+
+            handle1 = target;
+            while (handle1.getNext().getPosition() < position) {
+                if (handle1.getInstruction() instanceof ISTORE && ((ISTORE) handle1.getInstruction()).getIndex() == index) {
+                    return true;
+                }
+                if (handle1.getInstruction() instanceof IINC && ((IINC) handle1.getInstruction()).getIndex() == index) {
+                    return true;
+                }
             }
         }
         return false;
@@ -291,9 +303,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof IADD) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 + prevVal)));
@@ -302,9 +316,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof ISUB) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 - prevVal)));
@@ -326,9 +342,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof IDIV) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 / prevVal)));
@@ -337,9 +355,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof IREM) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 % prevVal)));
@@ -348,6 +368,7 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof INEG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(-prevVal)));
@@ -356,9 +377,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FADD) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 + prevVal)));
@@ -367,9 +390,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FSUB) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 - prevVal)));
@@ -378,9 +403,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FMUL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 * prevVal)));
@@ -389,9 +416,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FDIV) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 / prevVal)));
@@ -400,9 +429,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FREM) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(prevVal2 % prevVal)));
@@ -411,6 +442,7 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof FNEG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addFloat(-prevVal)));
@@ -419,9 +451,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LADD) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 + prevVal)));
@@ -430,9 +464,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LSUB) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 - prevVal)));
@@ -441,9 +477,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LMUL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 * prevVal)));
@@ -452,9 +490,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LDIV) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 / prevVal)));
@@ -463,9 +503,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LREM) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(prevVal2 % prevVal)));
@@ -474,6 +516,7 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof LNEG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addLong(-prevVal)));
@@ -482,9 +525,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DADD) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 + prevVal)));
@@ -493,9 +538,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DSUB) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 - prevVal)));
@@ -504,9 +551,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DMUL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 * prevVal)));
@@ -515,9 +564,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DDIV) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 / prevVal)));
@@ -526,9 +577,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DREM) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(prevVal2 % prevVal)));
@@ -537,6 +590,7 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof DNEG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 instList.insert(handle, new LDC2_W(cgen.getConstantPool().addDouble(-prevVal)));
@@ -545,9 +599,11 @@ public class ConstantFolder {
 
             if(handle.getInstruction() instanceof LCMP) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 long prevVal = getLongValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 long prevVal2 = getLongValue(prev2, instList, cpgen);
 
                 if(prevVal2 > prevVal) {
@@ -563,9 +619,11 @@ public class ConstantFolder {
 
             if(handle.getInstruction() instanceof FCMPG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 if(prevVal2 > prevVal) {
@@ -579,9 +637,11 @@ public class ConstantFolder {
 
             if(handle.getInstruction() instanceof FCMPL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 float prevVal = getFloatValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 float prevVal2 = getFloatValue(prev2, instList, cpgen);
 
                 if(prevVal2 < prevVal) {
@@ -595,9 +655,11 @@ public class ConstantFolder {
 
             if(handle.getInstruction() instanceof DCMPG) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 if(prevVal2 > prevVal) {
@@ -611,9 +673,11 @@ public class ConstantFolder {
 
             if(handle.getInstruction() instanceof DCMPL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 double prevVal = getDoubleValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 double prevVal2 = getDoubleValue(prev2, instList, cpgen);
 
                 if(prevVal2 < prevVal) {
