@@ -10,6 +10,7 @@ import java.util.Iterator;
 
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
+import org.apache.bcel.util.InstructionFinder;
 
 
 public class ConstantFolder {
@@ -542,140 +543,6 @@ public class ConstantFolder {
                 removeInstructions(instList, handle, prev);
             }
 
-            if (handle.getInstruction() instanceof IF_ICMPEQ) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 == prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
-            if (handle.getInstruction() instanceof IF_ICMPGE) {
-                InstructionHandle prev = handle.getPrev();
-                if(checkLoopModification(prev)) { continue; }
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 >= prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
-            if (handle.getInstruction() instanceof IF_ICMPGT) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 > prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
-            if (handle.getInstruction() instanceof IF_ICMPLE) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 <= prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
-            if (handle.getInstruction() instanceof IF_ICMPLT) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 < prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
-            if (handle.getInstruction() instanceof IF_ICMPNE) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
-                InstructionHandle prev2 = prev.getPrev();
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-
-                if(prevVal2 != prevVal) {
-                    instList.insert(handle, new ICONST (0));
-                }
-                else {
-                    instList.insert(handle, new ICONST (1));
-                }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev, prev2);
-                removeInstructions(instList, next, next1, next2);
-            }
-
             if(handle.getInstruction() instanceof LCMP) {
                 InstructionHandle prev = handle.getPrev();
                 long prevVal = getLongValue(prev, instList, cpgen);
@@ -757,113 +624,131 @@ public class ConstantFolder {
 
                 removeInstructions(instList, handle, prev, prev2);
             }
+        }
 
-            if(handle.getInstruction() instanceof IFEQ) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
+        InstructionFinder.CodeConstraint constraint = match -> {
+            IfInstruction if1 = (IfInstruction)match[0].getInstruction();
+            GOTO          g   = (GOTO)match[2].getInstruction();
+            return (if1.getTarget() == match[3]) && (g.getTarget() == match[3].getNext());
+        };
 
+        InstructionFinder f = new InstructionFinder(instList);
+        String pat = "IfInstruction ICONST_1 GOTO ICONST_0";
+
+        for(Iterator e = f.search(pat, constraint); e.hasNext(); ) {
+            InstructionHandle[] match = (InstructionHandle[])e.next();
+
+            InstructionHandle prev = match[0].getPrev();
+            if(checkLoopModification(prev)) { continue; }
+            int prevVal = getIntValue(prev, instList, cpgen);
+
+            InstructionHandle prev2 = prev.getPrev();
+            if(checkLoopModification(prev2)) { continue; }
+            int prevVal2 = getIntValue(prev2, instList, cpgen);
+
+            if (match[0].getInstruction() instanceof IF_ICMPEQ) {
+                if(prevVal2 == prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if (match[0].getInstruction() instanceof IF_ICMPGE) {
+                if(prevVal2 >= prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if (match[0].getInstruction() instanceof IF_ICMPGT) {
+                if(prevVal2 > prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if (match[0].getInstruction() instanceof IF_ICMPLE) {
+                if(prevVal2 <= prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if (match[0].getInstruction() instanceof IF_ICMPLT) {
+                if(prevVal2 < prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if (match[0].getInstruction() instanceof IF_ICMPNE) {
+                if(prevVal2 != prevVal) {
+                    instList.insert(match[0], new ICONST (0));
+                } else {
+                    instList.insert(match[0], new ICONST (1));
+                }
+            }
+
+            else if(match[0].getInstruction() instanceof IFEQ) {
                 if(prevVal == 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
             }
 
-            if(handle.getInstruction() instanceof IFGE) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
+            else if(match[0].getInstruction() instanceof IFGE) {
                 if(prevVal >= 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
             }
 
-            if(handle.getInstruction() instanceof IFGT) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
+            else if(match[0].getInstruction() instanceof IFGT) {
                 if(prevVal > 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
             }
 
-            if(handle.getInstruction() instanceof IFLE) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
+            else if(match[0].getInstruction() instanceof IFLE) {
                 if(prevVal <= 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
             }
 
-            if(handle.getInstruction() instanceof IFLT) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
+            else if(match[0].getInstruction() instanceof IFLT) {
                 if(prevVal < 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
-
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
-
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
             }
 
-            if(handle.getInstruction() instanceof IFNE) {
-                InstructionHandle prev = handle.getPrev();
-                int prevVal = getIntValue(prev, instList, cpgen);
-
+            else if(match[0].getInstruction() instanceof IFNE) {
                 if(prevVal != 0) {
-                    instList.insert(handle, new ICONST (0));
+                    instList.insert(match[0], new ICONST (0));
                 } else {
-                    instList.insert(handle, new ICONST (1));
+                    instList.insert(match[0], new ICONST (1));
                 }
+            }
 
-                InstructionHandle next = handle.getNext();
-                InstructionHandle next1 = next.getNext();
-                InstructionHandle next2 = next1.getNext();
+            else { continue; }
 
-                removeInstructions(instList, handle, prev);
-                removeInstructions(instList, next, next1, next2);
+            removeInstructions(instList, prev, prev2);
+            try {
+                instList.delete(match[0],match[3]);
+            } catch (TargetLostException e1) {
+                e1.printStackTrace();
             }
         }
 

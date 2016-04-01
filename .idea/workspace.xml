@@ -30,8 +30,8 @@
       <file leaf-file-name="ConstantFolder.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="679">
-              <caret line="192" column="44" selection-start-line="192" selection-start-column="44" selection-end-line="192" selection-end-column="44" />
+            <state relative-caret-position="3598">
+              <caret line="673" column="41" selection-start-line="673" selection-start-column="41" selection-end-line="673" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -42,8 +42,8 @@
       <file leaf-file-name="DynamicVariableFolding.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="722">
-              <caret line="37" column="1" selection-start-line="37" selection-start-column="1" selection-end-line="37" selection-end-column="1" />
+            <state relative-caret-position="744">
+              <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
               <folding />
             </state>
           </provider>
@@ -826,7 +826,7 @@
       <workItem from="1459363395680" duration="3681000" />
       <workItem from="1459435942746" duration="8370000" />
       <workItem from="1459476359442" duration="2672000" />
-      <workItem from="1459510511826" duration="12189000" />
+      <workItem from="1459510511826" duration="13555000" />
     </task>
     <task id="LOCAL-00001" summary="to work on windows">
       <created>1458581477609</created>
@@ -878,7 +878,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="63332000" />
+    <option name="totallyTimeSpent" value="64698000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
@@ -1256,14 +1256,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="744">
-          <caret line="63" column="6" selection-start-line="63" selection-start-column="6" selection-end-line="63" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/fortesting/fortesting/Five.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-180">
@@ -1274,16 +1266,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/comp207p/target/DynamicVariableFolding.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="722">
-          <caret line="37" column="1" selection-start-line="37" selection-start-column="1" selection-end-line="37" selection-end-column="1" />
+        <state relative-caret-position="744">
+          <caret line="38" column="8" selection-start-line="38" selection-start-column="8" selection-end-line="38" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/comp207p/target/DynamicVariableFoldingTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="744">
+          <caret line="63" column="6" selection-start-line="63" selection-start-column="6" selection-end-line="63" selection-end-column="6" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/comp207p/main/ConstantFolder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="679">
-          <caret line="192" column="44" selection-start-line="192" selection-start-column="44" selection-end-line="192" selection-end-column="44" />
+        <state relative-caret-position="3598">
+          <caret line="673" column="41" selection-start-line="673" selection-start-column="41" selection-end-line="673" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
