@@ -30,7 +30,7 @@ public class DynamicVariableFoldingTest
     {
         System.setOut(null);
     }
-
+    /*
     @Test
     public void testMethodOne()
     {
@@ -54,12 +54,10 @@ public class DynamicVariableFoldingTest
     public void testMethodThree()
     {
         assertEquals(84, dvf.methodThree());
-    }
+    }*/
 
-    /*
     @Test
     public void testMethodFour(){
         assertEquals(24, dvf.methodFour());
     }
-    */
 }

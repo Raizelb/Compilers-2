@@ -851,10 +851,13 @@ public class ConstantFolder {
         //System.out.println(smtno + " Stack map table found");
 
         if(smt != null) {
-            /*StackMapTableEntry[] smtearray = smt.getStackMapTable();
+            StackMapTableEntry[] smtearray = smt.getStackMapTable();
             System.out.println(smtearray.length + " Stack map table entries found");
 
-            ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
+            smtearray[0].setByteCodeOffsetDelta(17);
+            smtearray[1].setByteCodeOffsetDelta(21);
+
+            /*ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
             for (Iterator<StackMapTableEntry> iterator = smteArrayList.iterator(); iterator.hasNext();) {
                 StackMapTableEntry smte = iterator.next();
                 if (true) {
@@ -866,9 +869,9 @@ public class ConstantFolder {
             System.out.println(smteArrayList.size() + " Stack map table entries now");
 
             StackMapTableEntry[] smtearray2 = smteArrayList.toArray(new StackMapTableEntry[smteArrayList.size()]);
-            //smt.setStackMapTable(smtearray2);*/
+            smt.setStackMapTable(smtearray2);*/
 
-            methodGen.removeCodeAttribute(smt);
+            //methodGen.removeCodeAttribute(smt);
             //StackMapTable smt2 = new StackMapTable(smt.getNameIndex(), smt.getMapLength(), smtearray2, smt.getConstantPool());
             //methodGen.addCodeAttribute(smt2);
         }

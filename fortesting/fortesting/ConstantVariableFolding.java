@@ -1,4 +1,4 @@
-package comp207p.target;
+package fortesting;
 
 public class ConstantVariableFolding
 {

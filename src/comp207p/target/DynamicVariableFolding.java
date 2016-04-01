@@ -1,6 +1,6 @@
 package comp207p.target;
 
-public class DynamicVariableFolding {
+public class DynamicVariableFolding { /*
     public int methodOne() {
         int a = 42;
         int b = (a + 764) * 3;
@@ -23,6 +23,8 @@ public class DynamicVariableFolding {
         j = i + 5;
         return i * j;
     }
+
+    */
 
     public int methodFour(){
         int a = 534245;
