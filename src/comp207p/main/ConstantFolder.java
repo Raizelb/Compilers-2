@@ -167,22 +167,14 @@ public class ConstantFolder {
             InstructionHandle handle1 = handle;
             while (handle1.getPrev() != null) {
                 if(handle1.getInstruction() instanceof ISTORE) {
-                    int value = 0;
-                    if (handle1.getPrev().getInstruction() instanceof LDC) {
-                        value = (int) ((LDC) handle1.getPrev().getInstruction()).getValue(cpgen);
-                    } else if (handle1.getPrev().getInstruction() instanceof SIPUSH) {
-                        value = (int) ((SIPUSH) handle1.getPrev().getInstruction()).getValue();
-                    } else if (handle1.getPrev().getInstruction() instanceof BIPUSH) {
-                        value = (int) ((BIPUSH) handle1.getPrev().getInstruction()).getValue();
-                    } else if (handle1.getPrev().getInstruction() instanceof ICONST) {
-                        value = (int) ((ICONST) handle1.getPrev().getInstruction()).getValue();
-                    }
                     if (index == ((ISTORE) handle1.getInstruction()).getIndex()) {
-                        return value + increments;
+                        return getIntValue(handle1.getPrev(), instList, cpgen) + increments;
                     }
                 }
                 if(handle1.getInstruction() instanceof IINC) {
-                    increments += ((IINC) handle1.getInstruction()).getIncrement();
+                    if(((IINC) handle1.getInstruction()).getIndex() == index) {
+                        increments += ((IINC) handle1.getInstruction()).getIncrement();
+                    }
                 }
                 handle1 = handle1.getPrev();
             }
