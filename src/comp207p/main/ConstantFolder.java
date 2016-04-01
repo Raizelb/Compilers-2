@@ -163,6 +163,7 @@ public class ConstantFolder {
     private int loadIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof ILOAD) {
             int index = ((ILOAD) handle.getInstruction()).getIndex();
+            int increments = 0;
             InstructionHandle handle1 = handle;
             while (handle1.getPrev() != null) {
                 if(handle1.getInstruction() instanceof ISTORE) {
@@ -177,8 +178,11 @@ public class ConstantFolder {
                         value = (int) ((ICONST) handle1.getPrev().getInstruction()).getValue();
                     }
                     if (index == ((ISTORE) handle1.getInstruction()).getIndex()) {
-                        return value;
+                        return value + increments;
                     }
+                }
+                if(handle1.getInstruction() instanceof IINC) {
+                    increments += ((IINC) handle1.getInstruction()).getIncrement();
                 }
                 handle1 = handle1.getPrev();
             }

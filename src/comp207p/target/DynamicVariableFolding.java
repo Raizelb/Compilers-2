@@ -8,8 +8,6 @@ public class DynamicVariableFolding {
         return b + 1234 - a;
     }
 
-    /*
-
     public boolean methodTwo() {
         int x = 12345;
         int y = 54321;
@@ -25,6 +23,8 @@ public class DynamicVariableFolding {
         j = i + 5;
         return i * j;
     }
+
+    /*
     
     public int methodFour(){
         int a = 534245;
