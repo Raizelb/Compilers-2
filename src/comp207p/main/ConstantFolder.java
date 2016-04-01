@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
@@ -160,10 +163,44 @@ public class ConstantFolder {
         return 0;
     }
 
+    private boolean checkLoopModification(InstructionHandle handle) {
+        //check if trying to load a value inside a loop that will be modified after (shouldn't be folded)
+        //TODO check if modification happen inside loop before handle
+        if (handle.getInstruction() instanceof ILOAD) {
+            int index = ((ILOAD) handle.getInstruction()).getIndex();
+            int position = handle.getPosition();
+
+            InstructionHandle handle1 = handle;
+            boolean modifiedBeforeGoto = false;
+            while (handle1.getNext() != null) {
+                if (handle1.getInstruction() instanceof GOTO) {
+                    int targetPos = ((GOTO) handle1.getInstruction()).getTarget().getPosition();
+                    //TODO check instructions between targetPos and position?
+                    if (modifiedBeforeGoto && targetPos <= position) {
+                        return true;
+                    }
+                }
+                if (handle1.getInstruction() instanceof ISTORE) {
+                    if(((ISTORE) handle1.getInstruction()).getIndex() == index) {
+                        modifiedBeforeGoto = true;
+                    }
+                }
+                if (handle1.getInstruction() instanceof IINC) {
+                    if(((IINC) handle1.getInstruction()).getIndex() == index) {
+                        modifiedBeforeGoto = true;
+                    }
+                }
+                handle1 = handle1.getNext();
+            }
+        }
+        return false;
+    }
+
     private int loadIntValue(InstructionHandle handle, InstructionList instList, ConstantPoolGen cpgen) {
         if (handle.getInstruction() instanceof ILOAD) {
             int index = ((ILOAD) handle.getInstruction()).getIndex();
             int increments = 0;
+
             InstructionHandle handle1 = handle;
             while (handle1.getPrev() != null) {
                 if(handle1.getInstruction() instanceof ISTORE) {
@@ -235,7 +272,6 @@ public class ConstantFolder {
         return 0;
     }
 
-    // we rewrite integer constants with 5 :)
     private void optimizeMethod(ClassGen cgen, ConstantPoolGen cpgen, Method method) {
         // Get the Code of the method, which is a collection of bytecode instructions
         Code methodCode = method.getCode();
@@ -245,9 +281,9 @@ public class ConstantFolder {
         InstructionList instList = new InstructionList(methodCode.getCode());
 
         // Initialise a method generator with the original method as the baseline
-        MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
-                null, method.getName(), cgen.getClassName(), instList, cpgen);
-        //MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
+        //MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
+        //        null, method.getName(), cgen.getClassName(), instList, cpgen);
+        MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
 
         // InstructionHandle is a wrapper for actual Instructions
         for (InstructionHandle handle : instList.getInstructionHandles()) {
@@ -276,9 +312,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof IMUL) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 instList.insert(handle, new LDC(cgen.getConstantPool().addInteger(prevVal2 * prevVal)));
@@ -528,9 +566,11 @@ public class ConstantFolder {
 
             if (handle.getInstruction() instanceof IF_ICMPGE) {
                 InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
                 int prevVal = getIntValue(prev, instList, cpgen);
 
                 InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
                 int prevVal2 = getIntValue(prev2, instList, cpgen);
 
                 if(prevVal2 >= prevVal) {
@@ -827,11 +867,45 @@ public class ConstantFolder {
             }
         }
 
+        // setPositions(true) checks whether jump handles are all within the current method
+        instList.setPositions(true);
         methodGen.setInstructionList(instList);
 
-        // setPositions(true) checks whether jump handles
-        // are all within the current method
-        instList.setPositions(true);
+        Attribute[] attributes = methodGen.getCodeAttributes();
+        StackMapTable smt = null;
+
+        //int smtno = 0;
+        for (Attribute attribute : attributes) {
+            if(attribute instanceof StackMapTable) {
+                smt = (StackMapTable) attribute;
+                //smtno++;
+                System.out.println("Stack map table found");
+            }
+        }
+        //System.out.println(smtno + " Stack map table found");
+
+        if(smt != null) {
+            /*StackMapTableEntry[] smtearray = smt.getStackMapTable();
+            System.out.println(smtearray.length + " Stack map table entries found");
+
+            ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
+            for (Iterator<StackMapTableEntry> iterator = smteArrayList.iterator(); iterator.hasNext();) {
+                StackMapTableEntry smte = iterator.next();
+                if (true) {
+                    // Remove the current element from the iterator and the list.
+                    iterator.remove();
+                }
+            }
+
+            System.out.println(smteArrayList.size() + " Stack map table entries now");
+
+            StackMapTableEntry[] smtearray2 = smteArrayList.toArray(new StackMapTableEntry[smteArrayList.size()]);
+            //smt.setStackMapTable(smtearray2);*/
+
+            methodGen.removeCodeAttribute(smt);
+            //StackMapTable smt2 = new StackMapTable(smt.getNameIndex(), smt.getMapLength(), smtearray2, smt.getConstantPool());
+            //methodGen.addCodeAttribute(smt2);
+        }
 
         // set max stack/local
         methodGen.setMaxStack();
@@ -840,6 +914,7 @@ public class ConstantFolder {
         // remove local variable table
         methodGen.removeLocalVariables();
 
+        //methodGen.removeCodeAttributes();
 
         // generate the new method with replaced instList
         Method newMethod = methodGen.getMethod();
@@ -853,8 +928,11 @@ public class ConstantFolder {
         ConstantPoolGen cpgen = cgen.getConstantPool();
 
         // Do your optimization here
+        System.out.println("Optimising " + cgen.getClassName());
+
         Method[] methods = cgen.getMethods();
         for (Method m : methods) {
+            System.out.println("Optimising " + m.getName());
             optimizeMethod(cgen, cpgen, m);
         }
         gen = cgen;
