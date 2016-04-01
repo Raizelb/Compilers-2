@@ -204,6 +204,7 @@ public class ConstantFolder {
                 if (handle1.getInstruction() instanceof IINC && ((IINC) handle1.getInstruction()).getIndex() == index) {
                     return true;
                 }
+                handle1 = handle1.getNext();
             }
         }
         return false;
@@ -216,15 +217,11 @@ public class ConstantFolder {
 
             InstructionHandle handle1 = handle;
             while (handle1.getPrev() != null) {
-                if(handle1.getInstruction() instanceof ISTORE) {
-                    if (index == ((ISTORE) handle1.getInstruction()).getIndex()) {
-                        return getIntValue(handle1.getPrev(), instList, cpgen) + increments;
-                    }
+                if (handle1.getInstruction() instanceof ISTORE && index == ((ISTORE) handle1.getInstruction()).getIndex()) {
+                    return getIntValue(handle1.getPrev(), instList, cpgen) + increments;
                 }
-                if(handle1.getInstruction() instanceof IINC) {
-                    if(((IINC) handle1.getInstruction()).getIndex() == index) {
-                        increments += ((IINC) handle1.getInstruction()).getIncrement();
-                    }
+                if (handle1.getInstruction() instanceof IINC && ((IINC) handle1.getInstruction()).getIndex() == index) {
+                    increments += ((IINC) handle1.getInstruction()).getIncrement();
                 }
                 handle1 = handle1.getPrev();
             }
@@ -239,10 +236,8 @@ public class ConstantFolder {
             int index = ((FLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
-                if (handle1.getInstruction() instanceof FSTORE) {
-                    if (index == ((FSTORE) handle1.getInstruction()).getIndex()) {
-                        return getFloatValue(handle1.getPrev(), instList, cpgen);
-                    }
+                if (handle1.getInstruction() instanceof FSTORE && index == ((FSTORE) handle1.getInstruction()).getIndex()) {
+                    return getFloatValue(handle1.getPrev(), instList, cpgen);
                 }
                 handle1 = handle1.getPrev();
             }
@@ -256,10 +251,8 @@ public class ConstantFolder {
             int index = ((LLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
-                if (handle1.getInstruction() instanceof LSTORE) {
-                    if (index == ((LSTORE) handle1.getInstruction()).getIndex()) {
-                        return getLongValue(handle1.getPrev(), instList, cpgen);
-                    }
+                if (handle1.getInstruction() instanceof LSTORE && index == ((LSTORE) handle1.getInstruction()).getIndex()) {
+                    return getLongValue(handle1.getPrev(), instList, cpgen);
                 }
                 handle1 = handle1.getPrev();
             }
@@ -273,10 +266,8 @@ public class ConstantFolder {
             int index = ((DLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
             while (handle1.getPrev() != null) {
-                if (handle1.getInstruction() instanceof DSTORE) {
-                    if (index == ((DSTORE) handle1.getInstruction()).getIndex()) {
-                        return getDoubleValue(handle1.getPrev(), instList, cpgen);
-                    }
+                if (handle1.getInstruction() instanceof DSTORE && index == ((DSTORE) handle1.getInstruction()).getIndex()) {
+                    return getDoubleValue(handle1.getPrev(), instList, cpgen);
                 }
                 handle1 = handle1.getPrev();
             }

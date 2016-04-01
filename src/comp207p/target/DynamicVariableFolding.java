@@ -24,8 +24,6 @@ public class DynamicVariableFolding {
         return i * j;
     }
 
-    /*
-
     public int methodFour(){
         int a = 534245;
         int b = a - 1234;
@@ -36,5 +34,5 @@ public class DynamicVariableFolding {
         a = 4;
         b = a + 2;
         return a * b;
-    } */
+    }
 }
