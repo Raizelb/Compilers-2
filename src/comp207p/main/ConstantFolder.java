@@ -706,11 +706,12 @@ public class ConstantFolder {
             if(checkLoopModification(prev)) { continue; }
             int prevVal = getIntValue(prev, instList, cpgen);
 
-            InstructionHandle prev2 = prev.getPrev();
-            if(checkLoopModification(prev2)) { continue; }
-            int prevVal2 = getIntValue(prev2, instList, cpgen);
-
             if (match[0].getInstruction() instanceof IF_ICMPEQ) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 == prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -719,6 +720,11 @@ public class ConstantFolder {
             }
 
             else if (match[0].getInstruction() instanceof IF_ICMPGE) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 >= prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -727,6 +733,11 @@ public class ConstantFolder {
             }
 
             else if (match[0].getInstruction() instanceof IF_ICMPGT) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 > prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -735,6 +746,11 @@ public class ConstantFolder {
             }
 
             else if (match[0].getInstruction() instanceof IF_ICMPLE) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 <= prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -743,6 +759,11 @@ public class ConstantFolder {
             }
 
             else if (match[0].getInstruction() instanceof IF_ICMPLT) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 < prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -751,6 +772,11 @@ public class ConstantFolder {
             }
 
             else if (match[0].getInstruction() instanceof IF_ICMPNE) {
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+                removeInstructions(instList, prev2);
+
                 if(prevVal2 != prevVal) {
                     instList.insert(match[0], new ICONST (0));
                 } else {
@@ -808,7 +834,7 @@ public class ConstantFolder {
 
             else { continue; }
 
-            removeInstructions(instList, prev, prev2);
+            removeInstructions(instList, prev);
             try {
                 instList.delete(match[0],match[3]);
             } catch (TargetLostException e1) {
