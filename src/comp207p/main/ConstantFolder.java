@@ -683,6 +683,7 @@ public class ConstantFolder {
             }
         }
 
+        /*
         InstructionFinder.CodeConstraint constraint = match -> {
             IfInstruction if1 = (IfInstruction)match[0].getInstruction();
             GOTO          g   = (GOTO)match[2].getInstruction();
@@ -834,6 +835,7 @@ public class ConstantFolder {
                 e1.printStackTrace();
             }
         }
+        */
 
         // setPositions(true) checks whether jump handles are all within the current method
         instList.setPositions(true);
@@ -855,9 +857,8 @@ public class ConstantFolder {
             System.out.println(smtearray.length + " Stack map table entries found");
         }
 
+        // Update delta offsets in StackMapTable
         if(smtearray != null) {
-            //smtearray[0].setByteCodeOffsetDelta(17);
-            //smtearray[1].setByteCodeOffsetDelta(21);
             ArrayList<Integer> targets = new ArrayList<>();
             for (InstructionHandle handle : instList.getInstructionHandles()) {
                 if(handle.getInstruction() instanceof BranchInstruction) {
@@ -866,31 +867,28 @@ public class ConstantFolder {
                 }
             }
             Collections.sort(targets);
-            System.out.println("Positions = " + targets);
+            //System.out.println("Positions = " + targets);
+
             int prev = -1;
             for (int i = 0; i < targets.size(); i++) {
-                smtearray[i].setByteCodeOffsetDelta(targets.get(i) - prev - 1);
+                //System.out.println(smtearray[i].toString());
+                //System.out.print(smtearray[i].getByteCodeOffsetDelta());
+                String smte = smtearray[i].toString();
+                if(smte.startsWith("(SAME_LOCALS_1_STACK")) {
+                    smtearray[i] = new StackMapTableEntry(targets.get(i) - prev + 63, targets.get(i) - prev - 1,
+                            smtearray[i].getTypesOfLocals(), smtearray[i].getTypesOfStackItems(), smtearray[i].getConstantPool());
+                } else if(smte.startsWith("(SAME")) {
+                    smtearray[i] = new StackMapTableEntry(targets.get(i) - prev - 1, targets.get(i) - prev - 1,
+                            smtearray[i].getTypesOfLocals(), smtearray[i].getTypesOfStackItems(), smtearray[i].getConstantPool());
+                } else {
+                    smtearray[i].setByteCodeOffsetDelta(targets.get(i) - prev - 1);
+                }
+                //System.out.print(" ");
+                //System.out.println(smtearray[i].getByteCodeOffsetDelta());
+                //System.out.println(smtearray[i].toString());
                 prev = targets.get(i);
             }
         }
-
-        /*ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
-        for (Iterator<StackMapTableEntry> iterator = smteArrayList.iterator(); iterator.hasNext();) {
-            StackMapTableEntry smte = iterator.next();
-            if (true) {
-                // Remove the current element from the iterator and the list.
-                iterator.remove();
-            }
-        }
-
-        System.out.println(smteArrayList.size() + " Stack map table entries now");
-
-        /*StackMapTableEntry[] smtearray2 = smteArrayList.toArray(new StackMapTableEntry[smteArrayList.size()]);
-        smt.setStackMapTable(smtearray2);*/
-
-        //methodGen.removeCodeAttribute(smt);
-        //StackMapTable smt2 = new StackMapTable(smt.getNameIndex(), smt.getMapLength(), smtearray2, smt.getConstantPool());
-        //methodGen.addCodeAttribute(smt2);
 
         // set edited instruction list
         methodGen.setInstructionList(instList);
