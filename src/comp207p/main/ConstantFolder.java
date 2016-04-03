@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.apache.bcel.classfile.*;
@@ -288,6 +289,7 @@ public class ConstantFolder {
         //MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
         //        null, method.getName(), cgen.getClassName(), instList, cpgen);
         MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
+
 
         // InstructionHandle is a wrapper for actual Instructions
         for (InstructionHandle handle : instList.getInstructionHandles()) {
@@ -835,46 +837,63 @@ public class ConstantFolder {
 
         // setPositions(true) checks whether jump handles are all within the current method
         instList.setPositions(true);
-        methodGen.setInstructionList(instList);
 
+        // Get the StackMapTable
         Attribute[] attributes = methodGen.getCodeAttributes();
         StackMapTable smt = null;
-
-        //int smtno = 0;
         for (Attribute attribute : attributes) {
             if(attribute instanceof StackMapTable) {
                 smt = (StackMapTable) attribute;
-                //smtno++;
                 System.out.println("Stack map table found");
             }
         }
-        //System.out.println(smtno + " Stack map table found");
 
+        // Get the StackMapTableEntry list
+        StackMapTableEntry[] smtearray = null;
         if(smt != null) {
-            StackMapTableEntry[] smtearray = smt.getStackMapTable();
+            smtearray = smt.getStackMapTable();
             System.out.println(smtearray.length + " Stack map table entries found");
+        }
 
-            smtearray[0].setByteCodeOffsetDelta(17);
-            smtearray[1].setByteCodeOffsetDelta(21);
-
-            /*ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
-            for (Iterator<StackMapTableEntry> iterator = smteArrayList.iterator(); iterator.hasNext();) {
-                StackMapTableEntry smte = iterator.next();
-                if (true) {
-                    // Remove the current element from the iterator and the list.
-                    iterator.remove();
+        if(smtearray != null) {
+            //smtearray[0].setByteCodeOffsetDelta(17);
+            //smtearray[1].setByteCodeOffsetDelta(21);
+            ArrayList<Integer> targets = new ArrayList<>();
+            for (InstructionHandle handle : instList.getInstructionHandles()) {
+                if(handle.getInstruction() instanceof BranchInstruction) {
+                    InstructionHandle target = ((BranchInstruction) handle.getInstruction()).getTarget();
+                    targets.add(target.getPosition());
                 }
             }
-
-            System.out.println(smteArrayList.size() + " Stack map table entries now");
-
-            StackMapTableEntry[] smtearray2 = smteArrayList.toArray(new StackMapTableEntry[smteArrayList.size()]);
-            smt.setStackMapTable(smtearray2);*/
-
-            //methodGen.removeCodeAttribute(smt);
-            //StackMapTable smt2 = new StackMapTable(smt.getNameIndex(), smt.getMapLength(), smtearray2, smt.getConstantPool());
-            //methodGen.addCodeAttribute(smt2);
+            Collections.sort(targets);
+            System.out.println("Positions = " + targets);
+            int prev = -1;
+            for (int i = 0; i < targets.size(); i++) {
+                smtearray[i].setByteCodeOffsetDelta(targets.get(i) - prev - 1);
+                prev = targets.get(i);
+            }
         }
+
+        /*ArrayList<StackMapTableEntry> smteArrayList = new ArrayList<StackMapTableEntry>(Arrays.asList(smtearray));
+        for (Iterator<StackMapTableEntry> iterator = smteArrayList.iterator(); iterator.hasNext();) {
+            StackMapTableEntry smte = iterator.next();
+            if (true) {
+                // Remove the current element from the iterator and the list.
+                iterator.remove();
+            }
+        }
+
+        System.out.println(smteArrayList.size() + " Stack map table entries now");
+
+        /*StackMapTableEntry[] smtearray2 = smteArrayList.toArray(new StackMapTableEntry[smteArrayList.size()]);
+        smt.setStackMapTable(smtearray2);*/
+
+        //methodGen.removeCodeAttribute(smt);
+        //StackMapTable smt2 = new StackMapTable(smt.getNameIndex(), smt.getMapLength(), smtearray2, smt.getConstantPool());
+        //methodGen.addCodeAttribute(smt2);
+
+        // set edited instruction list
+        methodGen.setInstructionList(instList);
 
         // set max stack/local
         methodGen.setMaxStack();
