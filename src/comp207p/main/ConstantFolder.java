@@ -681,6 +681,33 @@ public class ConstantFolder {
 
                 removeInstructions(instList, handle, prev, prev2);
             }
+
+            if (handle.getInstruction() instanceof IF_ICMPEQ || handle.getInstruction() instanceof IF_ICMPGE ||
+                    handle.getInstruction() instanceof IF_ICMPGT || handle.getInstruction() instanceof IF_ICMPLE ||
+                    handle.getInstruction() instanceof IF_ICMPLT || handle.getInstruction() instanceof IF_ICMPNE) {
+                InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                InstructionHandle prev2 = prev.getPrev();
+                if(checkLoopModification(prev2)) { continue; }
+                int prevVal2 = getIntValue(prev2, instList, cpgen);
+
+                instList.insert(prev, new LDC(cgen.getConstantPool().addInteger(prevVal)));
+                instList.insert(prev2, new LDC(cgen.getConstantPool().addInteger(prevVal2)));
+                removeInstructions(instList, prev, prev2);
+            }
+
+            if (handle.getInstruction() instanceof IFEQ || handle.getInstruction() instanceof IFGE ||
+                    handle.getInstruction() instanceof IFGT || handle.getInstruction() instanceof IFLE ||
+                    handle.getInstruction() instanceof IFLT || handle.getInstruction() instanceof IFNE) {
+                InstructionHandle prev = handle.getPrev();
+                if(checkLoopModification(prev)) { continue; }
+                int prevVal = getIntValue(prev, instList, cpgen);
+
+                instList.insert(prev, new LDC(cgen.getConstantPool().addInteger(prevVal)));
+                removeInstructions(instList, prev);
+            }
         }
 
         /*
@@ -836,6 +863,8 @@ public class ConstantFolder {
             }
         }
         */
+
+
 
         // setPositions(true) checks whether jump handles are all within the current method
         instList.setPositions(true);
