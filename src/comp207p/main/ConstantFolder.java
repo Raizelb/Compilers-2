@@ -174,7 +174,7 @@ public class ConstantFolder {
 
             InstructionHandle handle1 = handle;
             boolean modifiedBeforeGoto = false;
-            while (handle1.getNext() != null) {
+            while (handle1 != null) {
                 if (handle1.getInstruction() instanceof GOTO) {
                     InstructionHandle targetLocal = ((GOTO) handle1.getInstruction()).getTarget();
                     int targetPos = targetLocal.getPosition();
@@ -198,7 +198,7 @@ public class ConstantFolder {
             if(target == null) { return false; }
 
             handle1 = target;
-            while (handle1.getNext().getPosition() < position) {
+            while (handle1.getPosition() < position) {
                 if (handle1.getInstruction() instanceof ISTORE && ((ISTORE) handle1.getInstruction()).getIndex() == index) {
                     return true;
                 }
@@ -217,7 +217,7 @@ public class ConstantFolder {
             int increments = 0;
 
             InstructionHandle handle1 = handle;
-            while (handle1.getPrev() != null) {
+            while (handle1 != null) {
                 if (handle1.getInstruction() instanceof ISTORE && index == ((ISTORE) handle1.getInstruction()).getIndex()) {
                     return getIntValue(handle1.getPrev(), instList, cpgen) + increments;
                 }
@@ -236,7 +236,7 @@ public class ConstantFolder {
         if (handle.getInstruction() instanceof FLOAD) {
             int index = ((FLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
-            while (handle1.getPrev() != null) {
+            while (handle1 != null) {
                 if (handle1.getInstruction() instanceof FSTORE && index == ((FSTORE) handle1.getInstruction()).getIndex()) {
                     return getFloatValue(handle1.getPrev(), instList, cpgen);
                 }
@@ -251,7 +251,7 @@ public class ConstantFolder {
         if (handle.getInstruction() instanceof LLOAD) {
             int index = ((LLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
-            while (handle1.getPrev() != null) {
+            while (handle1 != null) {
                 if (handle1.getInstruction() instanceof LSTORE && index == ((LSTORE) handle1.getInstruction()).getIndex()) {
                     return getLongValue(handle1.getPrev(), instList, cpgen);
                 }
@@ -266,7 +266,7 @@ public class ConstantFolder {
         if (handle.getInstruction() instanceof DLOAD) {
             int index = ((DLOAD) handle.getInstruction()).getIndex();
             InstructionHandle handle1 = handle.getPrev();
-            while (handle1.getPrev() != null) {
+            while (handle1 != null) {
                 if (handle1.getInstruction() instanceof DSTORE && index == ((DSTORE) handle1.getInstruction()).getIndex()) {
                     return getDoubleValue(handle1.getPrev(), instList, cpgen);
                 }
@@ -281,7 +281,7 @@ public class ConstantFolder {
         // Get the Code of the method, which is a collection of bytecode instructions
         Code methodCode = method.getCode();
 
-        // Now get the actualy bytecode data in byte array,
+        // Now get the actual bytecode data in byte array,
         // and use it to initialise an InstructionList
         InstructionList instList = new InstructionList(methodCode.getCode());
 
@@ -708,6 +708,21 @@ public class ConstantFolder {
                 instList.insert(prev, new LDC(cgen.getConstantPool().addInteger(prevVal)));
                 removeInstructions(instList, prev);
             }
+
+            /*
+            if (handle.getInstruction() instanceof ISTORE) {
+                InstructionHandle handle1 = handle.getNext();
+                int index = ((ISTORE) handle.getInstruction()).getIndex();
+                while(handle1 != null) {
+                    if(handle1.getInstruction() instanceof ILOAD && ((ILOAD)handle1.getInstruction()).getIndex() == index) {
+                        continue;
+                    }
+                    handle1 = handle1.getNext();
+                }
+                getIntValue(handle.getPrev(), instList, cpgen);
+                removeInstructions(instList, handle.getPrev());
+            }
+            */
         }
 
         /*
