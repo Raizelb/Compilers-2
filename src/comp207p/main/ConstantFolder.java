@@ -1,17 +1,14 @@
 package comp207p.main;
 
+import org.apache.bcel.classfile.*;
+import org.apache.bcel.generic.*;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
-
-import org.apache.bcel.classfile.*;
-import org.apache.bcel.generic.*;
-import org.apache.bcel.util.InstructionFinder;
 
 
 public class ConstantFolder {
@@ -34,33 +31,27 @@ public class ConstantFolder {
     private void removeInstructions(InstructionList instList, InstructionHandle handle1, InstructionHandle handle2,
                                     InstructionHandle handle3) {
         try {
-            // delete the old ones
             instList.delete(handle1);
             instList.delete(handle2);
             instList.delete(handle3);
         } catch (TargetLostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     private void removeInstructions(InstructionList instList, InstructionHandle handle1, InstructionHandle handle2) {
         try {
-            // delete the old ones
             instList.delete(handle1);
             instList.delete(handle2);
         } catch (TargetLostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     private void removeInstructions(InstructionList instList, InstructionHandle handle) {
         try {
-            // delete the old ones
             instList.delete(handle);
         } catch (TargetLostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -243,6 +234,7 @@ public class ConstantFolder {
                 handle1 = handle1.getPrev();
             }
         }
+
         System.out.println("Error loadFloatValue()");
         return 0;
     }
@@ -258,6 +250,7 @@ public class ConstantFolder {
                 handle1 = handle1.getPrev();
             }
         }
+
         System.out.println("Error loadLongValue()");
         return 0;
     }
@@ -273,6 +266,7 @@ public class ConstantFolder {
                 handle1 = handle1.getPrev();
             }
         }
+
         System.out.println("Error loadDoubleValue()");
         return 0;
     }
@@ -286,10 +280,7 @@ public class ConstantFolder {
         InstructionList instList = new InstructionList(methodCode.getCode());
 
         // Initialise a method generator with the original method as the baseline
-        //MethodGen methodGen = new MethodGen(method.getAccessFlags(), method.getReturnType(), method.getArgumentTypes(),
-        //        null, method.getName(), cgen.getClassName(), instList, cpgen);
         MethodGen methodGen = new MethodGen(method, cgen.getClassName(), cpgen);
-
 
         // InstructionHandle is a wrapper for actual Instructions
         for (InstructionHandle handle : instList.getInstructionHandles()) {
@@ -708,178 +699,7 @@ public class ConstantFolder {
                 instList.insert(prev, new LDC(cgen.getConstantPool().addInteger(prevVal)));
                 removeInstructions(instList, prev);
             }
-
-            /*
-            if (handle.getInstruction() instanceof ISTORE) {
-                InstructionHandle handle1 = handle.getNext();
-                int index = ((ISTORE) handle.getInstruction()).getIndex();
-                while(handle1 != null) {
-                    if(handle1.getInstruction() instanceof ILOAD && ((ILOAD)handle1.getInstruction()).getIndex() == index) {
-                        continue;
-                    }
-                    handle1 = handle1.getNext();
-                }
-                getIntValue(handle.getPrev(), instList, cpgen);
-                removeInstructions(instList, handle.getPrev());
-            }
-            */
         }
-
-        /*
-        InstructionFinder.CodeConstraint constraint = match -> {
-            IfInstruction if1 = (IfInstruction)match[0].getInstruction();
-            GOTO          g   = (GOTO)match[2].getInstruction();
-            return (if1.getTarget() == match[3]) && (g.getTarget() == match[3].getNext());
-        };
-
-        InstructionFinder f = new InstructionFinder(instList);
-        String pat = "IfInstruction ICONST_1 GOTO ICONST_0";
-
-        for(Iterator e = f.search(pat, constraint); e.hasNext(); ) {
-            InstructionHandle[] match = (InstructionHandle[])e.next();
-
-            InstructionHandle prev = match[0].getPrev();
-            if(checkLoopModification(prev)) { continue; }
-            int prevVal = getIntValue(prev, instList, cpgen);
-
-            if (match[0].getInstruction() instanceof IF_ICMPEQ) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 == prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if (match[0].getInstruction() instanceof IF_ICMPGE) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 >= prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if (match[0].getInstruction() instanceof IF_ICMPGT) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 > prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if (match[0].getInstruction() instanceof IF_ICMPLE) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 <= prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if (match[0].getInstruction() instanceof IF_ICMPLT) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 < prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if (match[0].getInstruction() instanceof IF_ICMPNE) {
-                InstructionHandle prev2 = prev.getPrev();
-                if(checkLoopModification(prev2)) { continue; }
-                int prevVal2 = getIntValue(prev2, instList, cpgen);
-                removeInstructions(instList, prev2);
-
-                if(prevVal2 != prevVal) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFEQ) {
-                if(prevVal == 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFGE) {
-                if(prevVal >= 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFGT) {
-                if(prevVal > 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFLE) {
-                if(prevVal <= 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFLT) {
-                if(prevVal < 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else if(match[0].getInstruction() instanceof IFNE) {
-                if(prevVal != 0) {
-                    instList.insert(match[0], new ICONST (0));
-                } else {
-                    instList.insert(match[0], new ICONST (1));
-                }
-            }
-
-            else { continue; }
-
-            removeInstructions(instList, prev);
-            try {
-                instList.delete(match[0],match[3]);
-            } catch (TargetLostException e1) {
-                e1.printStackTrace();
-            }
-        }
-        */
-
-
 
         // setPositions(true) checks whether jump handles are all within the current method
         instList.setPositions(true);
@@ -890,7 +710,6 @@ public class ConstantFolder {
         for (Attribute attribute : attributes) {
             if(attribute instanceof StackMapTable) {
                 smt = (StackMapTable) attribute;
-                System.out.println("Stack map table found");
             }
         }
 
@@ -898,7 +717,6 @@ public class ConstantFolder {
         StackMapTableEntry[] smtearray = null;
         if(smt != null) {
             smtearray = smt.getStackMapTable();
-            System.out.println(smtearray.length + " Stack map table entries found");
         }
 
         // Update delta offsets in StackMapTable
@@ -911,12 +729,9 @@ public class ConstantFolder {
                 }
             }
             Collections.sort(targets);
-            //System.out.println("Positions = " + targets);
 
             int prev = -1;
             for (int i = 0; i < targets.size(); i++) {
-                //System.out.println(smtearray[i].toString());
-                //System.out.print(smtearray[i].getByteCodeOffsetDelta());
                 String smte = smtearray[i].toString();
                 if(smte.startsWith("(SAME_LOCALS_1_STACK")) {
                     smtearray[i] = new StackMapTableEntry(targets.get(i) - prev + 63, targets.get(i) - prev - 1,
@@ -927,9 +742,6 @@ public class ConstantFolder {
                 } else {
                     smtearray[i].setByteCodeOffsetDelta(targets.get(i) - prev - 1);
                 }
-                //System.out.print(" ");
-                //System.out.println(smtearray[i].getByteCodeOffsetDelta());
-                //System.out.println(smtearray[i].toString());
                 prev = targets.get(i);
             }
         }
@@ -943,8 +755,6 @@ public class ConstantFolder {
 
         // remove local variable table
         methodGen.removeLocalVariables();
-
-        //methodGen.removeCodeAttributes();
 
         // generate the new method with replaced instList
         Method newMethod = methodGen.getMethod();
